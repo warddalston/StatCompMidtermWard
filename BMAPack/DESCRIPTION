@@ -1,0 +1,18 @@
+Package: BMAPack
+Title: Performing Bayesian Model Averaging
+Description: This package performs a Bayesian Model Averaging routine on simple
+    regressions.  Creates a BMA class, a function to fit BMA objects, 3
+    separate get methods to extract BMA slot elements, and a summary and plot
+    method for BMA objects. The BMA includes a large coefficient matrix, the
+    model odds for each fitted model, the expected value of each coefficient,
+    and the probability that that each coefficient is non-zero.
+Version: 0.1
+Date: 2014-03-19
+Author: Dalston G. Ward
+Maintainer: Dalston G. Ward <ward.dalston@gmail.com>
+Depends:
+    R (>= 3.0.0),
+    plyr,
+    methods
+License: GPL (>= 2)
+LazyData: true

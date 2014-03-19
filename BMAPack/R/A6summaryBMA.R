@@ -5,6 +5,7 @@
 #'@usage summary(object,...)
 #'
 #' @param object An object of class BMA  
+#' @param ... arguements passed to other functions 
 #' 
  #' @return A list containing the following elements
 #' \itemize{
@@ -14,12 +15,21 @@
 #'  }
 #' 
 #' @note This function prints to the console some meta deta about a BMA analysis, and then the expected value and probability of being non zero for each coefficient.  It also silently returns this same information as a list.  If the most likely mode includes output is simply "Vars:" this means that the null model is most likely.  
+#' @examples
+#' 
+#' set.seed(1801)
+#' myX <- matrix(rpois(n=150,lambda=15),ncol=10)
+#' myY <- sample(1:100,15,replace=TRUE) 
+#' obj <- fitBMA(myX, myY,g=3,parallel=FALSE)
+#' summary(obj)
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
 #' @seealso \code{\link{fitBMA}}
 #' @seealso \code{\link{getBMAinput}}
 #' @seealso \code{\link{getBMAcoefs}}
-#' @seealso \code{\link{BMA}}
-#' @aliases ANY
+#' @seealso \code{\link{getBMAout}}
+#' @seealso \code{\link{BMA-class}}
+#' @seealso \code{\link{plot,BMA-method}}
+#' @aliases summary summary,BMA-method
 #' @rdname summaryBMA
 #' @export
 setMethod(f="summary",

@@ -23,11 +23,16 @@
 #' @examples
 #' 
 #' set.seed(1801)
-#' X <- matrix(rpois(n=150,lambda=15),ncol=10)
-#' y <- sample(1:100,15,replace=TRUE) 
+#' myX <- matrix(rpois(n=150,lambda=15),ncol=10)
+#' myY <- sample(1:100,15,replace=TRUE) 
 #' fitBMA(myX, myY,g=3,parallel=FALSE)
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
-#' @seealso \code{\link{BMA}}
+#' @seealso \code{\link{BMA-class}}
+#' @seealso \code{\link{plot,BMA-method}}
+#' @seealso \code{\link{summary,BMA-method}}
+#' @seealso \code{\link{getBMAinput}}
+#' @seealso \code{\link{getBMAcoefs}}
+#' @seealso \code{\link{getBMAout}}
 #' @rdname fitBMA
 #' @aliases fitBMA,ANY-method
 #' @export

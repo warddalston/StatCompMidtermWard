@@ -1,6 +1,6 @@
-#' Get the input of a BMA object
+#' Get the coefficient matrix of a BMA object
 #' 
-#' Returns the matrix of covariates and the vector of outcome values used in a BMA analysis.
+#' Returns the coefficinet matrix used in a BMA analysis.
 #'
 #' @param object An object of class BMA  
 #' 
@@ -13,27 +13,27 @@
 #' \item \code{PostBetaNonZero} A vector of posterior probabalities that each coefficinet is non-zero
 #' \item \code{X} The first input, a matrix of covariate values (after standardization)
 #' \item \code{y} the second input, a numeric vector of the length as the number of rows of \code{X} (also after standardization) 
-#' \item \code{g} The third object input, which is the hyper prior used for calculating model odds and expected values of betas.
+#'  \item \code{g} The third object input, which is the hyper prior used for calculating model odds and expected values of betas.
 #' }
-#' @note This function simply returns the input of the analysis, and none of the estimated coefficients, odds, or probabilities. 
+#' @note This function simply returns the coefficient matrix of a BMA analysis.  WARNING: This object will often be very large: its dimensions will be the number of columns in \code{X} by 2^\code{X}. 
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
-#' @seealso \code{\link{getBMAcoefs}}
+#' @seealso \code{\link{getBMAinput}}
 #' @seealso \code{\link{getBMAout}}
-#' @seealso \code{\link{BMA}}
-#' @aliases BMA-method getBMAinput,BMA-method 
-#' @rdname getBMAinput
+#' @seealso \code{\link{BMA-class}}
+#' @aliases BMA-method getBMAcoefs,BMA-method 
+#' @rdname getBMAcoefs
 #' @export
-setGeneric("getBMAinput", #This function is used to get the input of a BMA object out. 
+setGeneric("getBMAcoefs", #This function is used to get the coefficient matrix of a BMA object. 
            function(object)  {
-             standardGeneric("getBMAinput")
+             standardGeneric("getBMAcoefs")
            }
 )
 
-#' @rdname getBMAinput
+#' @rdname getBMAcoefs
 #' @export
-setMethod(f="getBMAinput", 
+setMethod(f="getBMAcoefs", 
           signature="BMA",  
           definition=function(object){ 
-            return(list(X=object@X,y=object@y,g=object@g))
+            return(object@coefficients)
           }
 )

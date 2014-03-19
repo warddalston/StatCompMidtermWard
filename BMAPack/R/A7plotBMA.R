@@ -2,9 +2,10 @@
 #' 
 #' Plots the distributions of coefficient estimates from BMA objects.
 #' 
-#' @usage plot(x,...)
+#' @usage plot(x,y,...)
 #'
 #' @param x an object of class `BMA'
+#' @param y NOT USED IN THIS METHOD
 #' @param ... arguements passed on to other functions.  
 #' 
 #' @details The plot method for objects of class `BMA' plots the distribution of coefficient estimates for every coefficient.  It plots these on graphical devices of dimensions 3 by 3; therefore, there are 9 coefficient distribution plots per graphical pages.  it also plots as a vertical line at zero the probability that the coefficient is non-zero.  For coefficient estimates which do not have any density at or below zero, the limits of the x-axis are adjusted to include zero.  Each plot is titled according to the variable name.      
@@ -18,11 +19,14 @@
 #' plot(myBMA)
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
 #' @seealso \code{\link{BMA-class}}
+#' @seealso \code{\link{summary,BMA-method}}
+#' @seealso \code{\link{fitBMA}}
+#' @aliases plot plot,BMA-method
 #' @rdname plotBMA
 #' @export
 setMethod(f="plot",
           signature="BMA",
-          definition=function(x,...){
+          definition=function(x,y,...){
             par(mfrow=c(3,3),mar=c(2,3,3,2))
             sapply(1:ncol(x@X),function(z){
               dens <- density(x@coefficients[z,],na.rm=TRUE)

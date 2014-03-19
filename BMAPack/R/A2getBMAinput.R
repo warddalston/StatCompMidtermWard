@@ -1,6 +1,6 @@
-#' Get the inferential information BMA object
+#' Get the input of a BMA object
 #' 
-#' Returns the vectors of information about model fit and expected coefficent values from a BMA object
+#' Returns the matrix of covariates and the vector of outcome values used in a BMA analysis.
 #'
 #' @param object An object of class BMA  
 #' 
@@ -15,25 +15,25 @@
 #' \item \code{y} the second input, a numeric vector of the length as the number of rows of \code{X} (also after standardization) 
 #' \item \code{g} The third object input, which is the hyper prior used for calculating model odds and expected values of betas.
 #' }
-#' @note This function returns the four vectors which are helpful in making inferences about the effects of covariates on the outcome variable.  
+#' @note This function simply returns the input of the analysis, and none of the estimated coefficients, odds, or probabilities. 
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
-#' @seealso \code{\link{getBMAinput}}
 #' @seealso \code{\link{getBMAcoefs}}
-#' @seealso \code{\link{BMA}}
-#' @aliases BMA-method getBMAout,BMA-method 
-#' @rdname getBMAout
+#' @seealso \code{\link{getBMAout}}
+#' @seealso \code{\link{BMA-class}}
+#' @aliases getBMAinput,BMA-method 
+#' @rdname getBMAinput
 #' @export
-setGeneric("getBMAout",
+setGeneric("getBMAinput", #This function is used to get the input of a BMA object out. 
            function(object)  {
-             standardGeneric("getBMAout")
+             standardGeneric("getBMAinput")
            }
 )
 
-#' @rdname getBMAout
+#' @rdname getBMAinput
 #' @export
-setMethod(f="getBMAout", #f is some generic method that R knows (it knows getBMA because we just taught it to R in the function right about here!!!!! )
-          signature="BMA", #now we teach R what to do when it sees getBMA and the input is of class BMA! 
+setMethod(f="getBMAinput", 
+          signature="BMA",  
           definition=function(object){ 
-            return(list(R2=object@R2,PostMO=object@PostMO,PostEB=object@PostEB,PostBetaNonZero=object@PostBetaNonZero)) #this get method only returns the output useful for making inferences: R2s, posterior probabaliites and odds, and expected values.  
-          } #close the funciton
-) #close set method
+            return(list(X=object@X,y=object@y,g=object@g))
+          }
+)

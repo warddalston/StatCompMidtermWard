@@ -19,8 +19,8 @@
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
 #' @seealso \code{\link{getBMAinput}}
 #' @seealso \code{\link{getBMAout}}
-#' @seealso \code{\link{BMA}}
-#' @aliases BMA-method getBMAcoefs,BMA-method 
+#' @seealso \code{\link{BMA-class}}
+#' @aliases getBMAcoefs,BMA-method 
 #' @rdname getBMAcoefs
 #' @export
 setGeneric("getBMAcoefs", #This function is used to get the coefficient matrix of a BMA object. 
