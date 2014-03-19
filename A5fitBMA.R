@@ -16,6 +16,7 @@
 #' \item{PostBetaNonZero}{ A vector of length n of posterior probabalities that the true value each coefficinet is non-zero}
 #'  \item{X}{ The first object input, with each variable standardized by subtracting by the mean and dividing by the standard deviation} 
 #'  \item{y}{ The second object input, with values standardized by subtracting by the mean and dividing by the standard deviation}
+#'  \item{g}{ The third object input, which is the hyper prior used for calculating model odds and expected values of betas.}
 #'  }
 #'  
 #' @note The input objects are standardized in order to make the inclusion of an intercept unneccessary. This function can take a VERY VERY long time to run as the number of covariates increases.  With 10 covariates, it takes about a second to run in parallel with 4 cores.  With 14 covariates, it takes about 45 seconds.  The time to run the funciton increases RAPIDLY with each additional covariate included in X.    
@@ -43,7 +44,7 @@ setMethod(f="fitBMA",
             standX <- scale(X) #the scale function subtracts the mean from each column of X and then divides by the standard deviation.  Using system time, I found that it was marginally faster than using apply.  
             standY <- as.numeric(scale(y)) #the output of scale is a matrix.  I coerce it back into a numeric.  
             
-            #The method first creates a logical matrix specifying which variables are in each of the combinations.  There are 2^n possible combinations of covariates. This can be
+            #The method first creates a logical matrix specifying which variables are in each of the combinations.  There are 2^n possible combinations of covariates.
             selectorList <- alply(.data=0:ncol(X),.margins=1, .fun=function(x){ 
               apply(combn(1:ncol(X),x), 2, function(z){
                 CurrentCombn <- logical(length=ncol(X))
@@ -77,9 +78,7 @@ setMethod(f="fitBMA",
              R.squareds[x+1] <<- Coefs[[x]][[2]]
            })
 
-            #Outside of the apply, I put in the intercept coefficient for the null model in the first column/element of each item. I add a row to the bottom of the coefficients object for the coefficient of the null model. 
-            Coefficients <- rbind(Coefficients,c(lm(standY~1)[[1]],rep(NA,ncol(Coefficients)-1))) 
-            rownames(Coefficients)[nrow(Coefficients)] <- "Intercept"
+            #Outside of the apply, I put in the R^2 for the null model into the vector of R squared values. 
             R.squareds[1] <- summary(lm(standY~1))[["r.squared"]]
             
            #Now I move on to writing code to create the inference objects.  I begin by calculating the B[M_k:M_0] values, as described on slide 25. 
@@ -91,7 +90,7 @@ setMethod(f="fitBMA",
           
            #This section calculates the posterior expected value for each coefficient 
            EBkMk <- (g/(g+1))*Coefficients #this is the expected beta given the model (from slide 3)
-          Post.EB <- apply(Coefficients[1:ncol(X),],1,function(x){
+          Post.EB <- apply(EBkMk[1:ncol(X),],1,function(x){
             missing <- which(is.na(x)) #pick out the right models by dropping all models where a given covariate is not included.
             t(Post.MO[-missing]%*%x[-missing]) #matrix multiplication performs the multiplication and summation in one step.  Nice.  
           } #close the function
@@ -104,7 +103,6 @@ setMethod(f="fitBMA",
           ) #close apply
           
             #it returns the output generated above as the input of the slots of an S4 object of "BMA class
-            return(new("BMA", coefficients=Coefficients,R2=R.squareds,PostMO=Post.MO,PostEB=Post.EB,PostBetaNonZero=Post.NonZero,X=standX,y=standY))
+            return(new("BMA", coefficients=Coefficients,R2=R.squareds,PostMO=Post.MO,PostEB=Post.EB,PostBetaNonZero=Post.NonZero,X=standX,y=standY,g=g))
           }
 )
-

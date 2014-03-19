@@ -13,6 +13,7 @@
 #' \item \code{PostBetaNonZero} A vector of posterior probabalities that each coefficinet is non-zero
 #' \item \code{X} The first input, a matrix of covariate values (after standardization)
 #' \item \code{y} the second input, a numeric vector of the length as the number of rows of \code{X} (also after standardization) 
+#' \item \code{g} The third object input, which is the hyper prior used for calculating model odds and expected values of betas.
 #' }
 #' @note This function returns the four vectors which are helpful in making inferences about the effects of covariates on the outcome variable.  
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}

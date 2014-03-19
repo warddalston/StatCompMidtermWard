@@ -12,6 +12,7 @@
 #' \item \code{PostBetaNonZero} A vector of posterior probabalities that each coefficinet is non-zero
 #' \item \code{X} The first input, a matrix of covariate values (after standardization)
 #' \item \code{y} the second input, a numeric vector of the length as the number of rows of \code{X} (also after standardization) 
+#' \item \code{g} The third object input, which is the hyper prior used for calculating model odds and expected values of betas.
 #' }
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
 #' @seealso \code{\link{getBMAinput}}
@@ -28,7 +29,8 @@ setClass(Class="BMA",
            PostEB = "numeric",
            PostBetaNonZero = "numeric",
            X = "matrix",
-           y = "numeric"
+           y = "numeric",
+           g = "numeric"
          ),
          prototype = prototype(
            coefficients = matrix(),
@@ -37,14 +39,15 @@ setClass(Class="BMA",
            PostEB = numeric(),
            PostBetaNonZero = numeric(),
            X = matrix(),
-           y = numeric()
+           y = numeric(),
+           g = numeric()
          )
 )
 
 #' @rdname BMA
 #' @export
 setMethod("initialize", "BMA", 
-          function(.Object, coefficients=matrix(0,nrow=1,ncol=1), R2=numeric(0),PostMO=numeric(0),PostEB=numeric(0),PostBetaNonZero=numeric(0),X=matrix(0,nrow=1,ncol=1),y=numeric(0)){ #these are the default values for an object of class BMA.
+          function(.Object, coefficients=matrix(0,nrow=1,ncol=1), R2=numeric(0),PostMO=numeric(0),PostEB=numeric(0),PostBetaNonZero=numeric(0),X=matrix(0,nrow=1,ncol=1),y=numeric(0),g=numeric(0)){ #these are the default values for an object of class BMA.
             
             #below are three basic checks to make sure that the user is giving us the proper information for a BMA analysis. 
             if(any(is.na(X))){
@@ -63,6 +66,7 @@ setMethod("initialize", "BMA",
             .Object@PostBetaNonZero <- PostBetaNonZero
             .Object@X <- X
             .Object@y <- y
+            .Object@g <- g
             .Object
           }
 ) 

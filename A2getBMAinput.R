@@ -13,6 +13,7 @@
 #' \item \code{PostBetaNonZero} A vector of posterior probabalities that each coefficinet is non-zero
 #' \item \code{X} The first input, a matrix of covariate values (after standardization)
 #' \item \code{y} the second input, a numeric vector of the length as the number of rows of \code{X} (also after standardization) 
+#' \item \code{g} The third object input, which is the hyper prior used for calculating model odds and expected values of betas.
 #' }
 #' @note This function simply returns the input of the analysis, and none of the estimated coefficients, odds, or probabilities. 
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
@@ -33,6 +34,6 @@ setGeneric("getBMAinput", #This function is used to get the input of a BMA objec
 setMethod(f="getBMAinput", 
           signature="BMA",  
           definition=function(object){ 
-            return(list(X=object@X,y=object@y))
+            return(list(X=object@X,y=object@y,g=object@g))
           }
 )
