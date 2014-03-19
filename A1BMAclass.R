@@ -44,14 +44,16 @@ setClass(Class="BMA",
 #' @rdname BMA
 #' @export
 setMethod("initialize", "BMA", 
-          function(.Object, coefficients=matrix(0,nrow=1,ncol=1), R2=numeric(0),PostMO=numeric(0),PostEB=numeric(0),PostBetaNonZero=numeric(0),X=matrix(0,nrow=1,ncol=1),y=numeric(1)){
+          function(.Object, coefficients=matrix(0,nrow=1,ncol=1), R2=numeric(0),PostMO=numeric(0),PostEB=numeric(0),PostBetaNonZero=numeric(0),X=matrix(0,nrow=1,ncol=1),y=numeric(0)){ #these are the default values for an object of class BMA.
+            
+            #below are three basic checks to make sure that the user is giving us the proper information for a BMA analysis. 
             if(any(is.na(X))){
               stop("The function does not accept covariate matrices with missing values")
             }
             if(any(is.na(y))){
               stop("The function does not accept outcome vectors with missing values")
             }
-            if(length(y)!=nrow(X)){
+            if(!length(y)==0 & length(y)!=nrow(X)){ #the first part of this logical makes the default BMA object not trigger this if loop.  
               stop("The length of y and the number of rows of X must be equal")
             }
             .Object@coefficients <- coefficients
@@ -64,3 +66,4 @@ setMethod("initialize", "BMA",
             .Object
           }
 ) 
+
