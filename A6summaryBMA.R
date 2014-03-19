@@ -2,6 +2,8 @@
 #' 
 #' Invisibly creates a summary of important information about the coefficients in a BMA object, and prints this summary.  
 #'
+#'@usage summary(object,...)
+#'
 #' @param object An object of class BMA  
 #' 
  #' @return A list containing the following elements
@@ -37,6 +39,5 @@ setMethod(f="summary",
             invisible(list(MetaData=MetaData,ExpectedBetas=object@PostEB,BetaNonZeroProbs=object@PostBetaNonZero))
           }
 )
-SHHH <- summary(yay)
 
 
