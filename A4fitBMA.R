@@ -4,6 +4,8 @@
 #'
 #' @param X A numeric matrix object of covariates with no missing values 
 #' @param y A numeric object with the same number of elements as \code{X} has rows.
+#' @param g A scalar to represent a hyper prior.  Defaults to 3.  An alternative could be 4.
+#' @param parallel A logical determining whether or not to run in parallel.  The user is responible for initializing his/her own instances.  Defaults to FALSE. 
 #'
 #' @return An object of class BMA containing
 #' \itemize{
@@ -16,25 +18,26 @@
 #'  \item{y}{ The second object input, with values standardized by subtracting by the mean and dividing by the standard deviation}
 #'  }
 #'  
-#' @note The input objects are standardized in order to make the inclusion of an intercept unneccessary.  
+#' @note The input objects are standardized in order to make the inclusion of an intercept unneccessary. This function can take a VERY VERY long time to run as the number of covariates increases.  With 10 covariates, it takes about a second to run in parallel with 4 cores.  With 14 covariates, it takes about 45 seconds.  The time to run the funciton increases RAPIDLY with each additional covariate included in X.    
 #' @examples
 #' 
- set.seed(1801)
- X <- matrix(rpois(n=150,lambda=15),ncol=10)
- y <- sample(1:100,15,replace=TRUE) 
-#' fitRegCombin(myX, myY)
+#' set.seed(1801)
+#' X <- matrix(rpois(n=150,lambda=15),ncol=10)
+#' y <- sample(1:100,15,replace=TRUE) 
+#' fitBMA(myX, myY,g=3,parallel=FALSE)
 #' @author Dalston G. Ward \email{ward.dalston@@gmail.com}
+#' @seealso \code{\link{BMA}}
 #' @rdname fitBMA
 #' @aliases fitBMA,ANY-method
 #' @export
 setGeneric(name="fitBMA",
-           def=function(X,y)
+           def=function(X,y,g=3,parallel=FALSE)
            {standardGeneric("fitBMA")}
 )
 
 #' @export
 setMethod(f="fitBMA",
-          definition=function(X, y, g=3, parallel=TRUE){
+          definition=function(X, y, g=3, parallel=FALSE){
             
             #Start by standardizing the input objects
             standX <- scale(X) #the scale function subtracts the mean from each column of X and then divides by the standard deviation.  Using system time, I found that it was marginally faster than using apply.  
@@ -55,9 +58,7 @@ setMethod(f="fitBMA",
             
             Coefficients <- matrix(nrow=ncol(X),ncol=2^ncol(X))
             R.squareds <- vector(length=2^ncol(X))
-            Post.EB <- vector(length=ncol(X))
-            Post.BetaNonZero <- vector(length=ncol(X))
-            colnames(Coefficients) <- names(R.squareds) <- names(Post.MO) <- apply(selectorMatrix,2,function(x){
+            colnames(Coefficients) <- names(R.squareds) <- apply(selectorMatrix,2,function(x){
             paste("Vars:",paste(which(x==TRUE),collapse=","))
             })
             rownames(Coefficients) <- c(paste("Variable", 1:(ncol(X)), sep=" "))
@@ -102,7 +103,8 @@ setMethod(f="fitBMA",
           } #close the funciton.
           ) #close apply
           
-            #it returns the output generated above as the input of the slots of an S4 object of "RegCombin" class
-            return(new("BMA", coefficients=Coefficients,R2=R.squareds,X=X[,2:ncol(X)],y=y))
+            #it returns the output generated above as the input of the slots of an S4 object of "BMA class
+            return(new("BMA", coefficients=Coefficients,R2=R.squareds,PostMO=Post.MO,PostEB=Post.EB,PostBetaNonZero=Post.NonZero,X=standX,y=standY))
           }
 )
+
