@@ -52,33 +52,56 @@ setMethod(f="fitBMA",
             
             
             #The next section creates the objects that will be in the output.  They have informative names and are sized based on parameter inputs.   
+            
             Coefficients <- matrix(nrow=ncol(X),ncol=2^ncol(X))
             R.squareds <- vector(length=2^ncol(X))
-            Post.MO <- vector(length=2^ncol(X))
             Post.EB <- vector(length=ncol(X))
             Post.BetaNonZero <- vector(length=ncol(X))
-            #colnames(Coefficients) <- names(R.squareds) <- names(Post.MO) <- apply(selectorMatrix,2,function(x){
-            #  gsub("0","Int",paste("Vars:",paste(which(x==TRUE)-1,collapse=",")))
-            #})
-            #rownames(Coefficients) <- c("Int",paste("Variable", 1:(ncol(X)-1), sep=" "))
+            colnames(Coefficients) <- names(R.squareds) <- names(Post.MO) <- apply(selectorMatrix,2,function(x){
+            paste("Vars:",paste(which(x==TRUE),collapse=","))
+            })
+            rownames(Coefficients) <- c(paste("Variable", 1:(ncol(X)), sep=" "))
             
-            #This section of this function does the actual regression fitting.  Using a_ply it fits a regression for each column of the selectorMatrix where the covariates are the based on the "TRUE" values for a given column.  Then, it writes the coefficent values and R^2 value to the appropriate element of the output objects using "<<-" to force writing these to the first variable matching the specified name in a parent environment.  This is basically R-cheating.  
-           oops <-  alply(.data=2:ncol(selectorMatrix),.margins=1,.fun=function(z){
-              mod <- lm(standY~standX[,selectorMatrix[,z]]-1)
-              Coefficients[selectorMatrix[,z],z] <- mod[[1]] 
+            #This section of this function does the actual regression fitting.  Using alply it fits a regression for each column of the selectorMatrix where the covariates are the based on the "TRUE" values for a given column. It stores the coefficients and R^2 values from these regressions in a large "list of lists".  Then a call to l_ply using the <<- function puts all of these values together into a useful output.  
+            
+            Coefs <-  alply(.data=2:ncol(selectorMatrix),.margins=1,.fun=function(z){
+              mod <- lm(standY~standX[,selectorMatrix[,z]]-1) #fit the regression, no intercept.
+              Coefficients[selectorMatrix[,z],z] <- mod[[1]]  #store coefficients, preserving NA's where there is no coeffficinet.
               R.squareds[z] <- summary(mod)[["r.squared"]]
-              return(list(Coefficients=Coefficients[,z],R.Squareds=R.squareds))
-            },.parallel=TRUE)
+              return(list(Coefficients=Coefficients[,z],R.Squareds=R.squareds[z])) #return the appropriate coefficeint values and R squared. 
+            },.parallel=parallel) #does parallel.  
            
-           l_ply(.data=1:length(oops),.fun=function(x){
-             Coefficients[,x+1] <<- oops[[x]][[1]]
+           l_ply(.data=1:length(Coefs),.fun=function(x){
+             Coefficients[,x+1] <<- Coefs[[x]][[1]] #these next two lines use "<<-" which force R to write to the first object which matches the name it finds in a parent environment.  Doesn't work as nicely in parallel, hence this and the code above being separate. 
+             R.squareds[x+1] <<- Coefs[[x]][[2]]
            })
-            #Outside of the apply, I put in the intercept coefficient for the null model in the first column/slot of each item.
+
+            #Outside of the apply, I put in the intercept coefficient for the null model in the first column/element of each item. I add a row to the bottom of the coefficients object for the coefficient of the null model. 
             Coefficients <- rbind(Coefficients,c(lm(standY~1)[[1]],rep(NA,ncol(Coefficients)-1))) 
+            rownames(Coefficients)[nrow(Coefficients)] <- "Intercept"
             R.squareds[1] <- summary(lm(standY~1))[["r.squared"]]
             
-            
-            
+           #Now I move on to writing code to create the inference objects.  I begin by calculating the B[M_k:M_0] values, as described on slide 25. 
+            BMkM0 <- sapply(1:ncol(Coefficients),function(x){
+              (1+g)^(nrow(X)-sum(!is.na(Coefficients[1:ncol(X),x]))-1)*(1+g*(1-R.squareds[x]))^(-1*(nrow(X)-1)/2)
+            }) #the sum(!is.na... piece of code counts the number of variables!
+           #The Mean posterior model odds is simply this divided by the sum of all the BMkM0s
+           Post.MO <- BMkM0/sum(BMkM0)
+          
+           #This section calculates the posterior expected value for each coefficient 
+           EBkMk <- (g/(g+1))*Coefficients #this is the expected beta given the model (from slide 3)
+          Post.EB <- apply(Coefficients[1:ncol(X),],1,function(x){
+            missing <- which(is.na(x)) #pick out the right models by dropping all models where a given covariate is not included.
+            t(Post.MO[-missing]%*%x[-missing]) #matrix multiplication performs the multiplication and summation in one step.  Nice.  
+          } #close the function
+          ) #close the apply 
+           
+           #This section calculates the posterior probability that the coefficient is non zero
+          Post.NonZero <- apply(Coefficients[1:ncol(X),],1,function(x){
+            sum(Post.MO[-which(is.na(x))])
+          } #close the funciton.
+          ) #close apply
+          
             #it returns the output generated above as the input of the slots of an S4 object of "RegCombin" class
             return(new("BMA", coefficients=Coefficients,R2=R.squareds,X=X[,2:ncol(X)],y=y))
           }
