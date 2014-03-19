@@ -37,3 +37,6 @@ plot(toy)
 getBMAinput(toy)
 getBMAout(toy)
 getBMAcoefs(toy)
+
+## Build a version of the package to share manually
+build(current.code, path=getwd())
