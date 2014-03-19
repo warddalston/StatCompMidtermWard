@@ -20,3 +20,20 @@ install(pkg=current.code, local=TRUE)
 
 #see what things may be wrong...
 check(current.code)
+
+#code to test 
+library(BMAPack)
+library(doMC)
+library(multicore)
+library(foreach)
+
+#set up parallel
+registerDoMC(cores=4)
+myX <- matrix(rnorm(1000),ncol=10)
+myY <- myX[,1]*2+myX[,3]*10+rnorm(100)
+toy <- fitBMA(myX,myY,g=3,parallel=TRUE)
+summary(toy)
+plot(toy)
+getBMAinput(toy)
+getBMAout(toy)
+getBMAcoefs(toy)
