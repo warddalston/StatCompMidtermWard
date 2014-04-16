@@ -16,3 +16,12 @@ Depends:
     methods
 License: GPL (>= 2)
 LazyData: true
+Collate:
+    'A1BMAclass.R'
+    'A2getBMAinput.R'
+    'A3getBMAcoefs.R'
+    'A4getBMAout.R'
+    'A5fitBMA.R'
+    'A6summaryBMA.R'
+    'A7plotBMA.R'
+    'BMAPack-package.r'

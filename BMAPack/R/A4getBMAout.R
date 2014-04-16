@@ -34,6 +34,6 @@ setGeneric("getBMAout",
 setMethod(f="getBMAout", #f is some generic method that R knows (it knows getBMA because we just taught it to R in the function right about here!!!!! )
           signature="BMA", #now we teach R what to do when it sees getBMA and the input is of class BMA! 
           definition=function(object){ 
-            return(list(R2=object@R2,PostMO=object@PostMO,PostEB=object@PostEB,PostBetaNonZero=object@PostBetaNonZero)) #this get method only returns the output useful for making inferences: R2s, posterior probabaliites and odds, and expected values.  
+            return(list(R2=object@R2,PostMO=object@PostMO,PostEB=object@PostEB,PostBetaNonZero=object@PostBetaNonZero)) #this get method only returns the output useful for making inferences: R2s, posterior probabilities and odds, and expected values.  
           } #close the funciton
 ) #close set method

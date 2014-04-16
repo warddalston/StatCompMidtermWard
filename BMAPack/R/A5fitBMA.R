@@ -1,6 +1,6 @@
 #' Perform a BMA analysis
 #'
-#' Regresses all possible combinations of a covariates on an outcome variable and then calculates several odds and probablities for use in making inferences about the effects of covariates on the outcome variable. 
+#' Regresses all possible combinations of a covariates on an outcome variable and then calculates several odds and probablities for use in making inferences about the effects of covariates on the outcome variable. ### This is probably too vague to be useful
 #'
 #' @param X A numeric matrix object of covariates with no missing values 
 #' @param y A numeric object with the same number of elements as \code{X} has rows.
@@ -9,7 +9,7 @@
 #'
 #' @return An object of class BMA containing
 #' \itemize{
-#'  \item{coefficients}{ A n by 2^n matrix of coefficient values, where n is the number of columns in \code{X}.  Each column in this object represeents the output of a single model, each row represents a given variable in \code{X}.}
+#'  \item{coefficients}{ A n by 2^n matrix of coefficient values, where n is the number of columns in \code{X}.  Each column in this object represents the output of a single model, each row represents a given variable in \code{X}.}
 #'  \item{R2}{ A numeric vector of length 2^n of R^2 values, where n is the number of columns in \code{X}.}
 #' \item{PostMO}{ A vector of length 2^n of the posterior model odds for each model.} 
 #' \item{PostEB}{ A vector of length n of posterior expected values for each of the coefficients.}
@@ -19,7 +19,7 @@
 #'  \item{g}{ The third object input, which is the hyper prior used for calculating model odds and expected values of betas.}
 #'  }
 #'  
-#' @note The input objects are standardized in order to make the inclusion of an intercept unneccessary. This function can take a VERY VERY long time to run as the number of covariates increases.  With 10 covariates, it takes about a second to run in parallel with 4 cores.  With 14 covariates, it takes about 45 seconds.  The time to run the funciton increases RAPIDLY with each additional covariate included in X.    
+#' @note The input objects are standardized in order to make the inclusion of an intercept unneccessary. This function can take a VERY VERY long time to run as the number of covariates increases.  With 10 covariates, it takes about a second to run in parallel with 4 cores.  With 14 covariates, it takes about 45 seconds.  The time to run the function increases RAPIDLY with each additional covariate included in X.    
 #' @examples
 #' 
 #' set.seed(1801)
@@ -58,7 +58,7 @@ setMethod(f="fitBMA",
               }) #close the apply
             },.parallel=parallel) #close the alply
             selectorMatrix <- matrix(unlist(selectorList),nrow=ncol(X)) #turn the list output in a matrix.  
-            
+## FYI: See the expand.grid() function
             
             #The next section creates the objects that will be in the output.  They have informative names and are sized based on parameter inputs.   
             
@@ -83,6 +83,8 @@ setMethod(f="fitBMA",
              R.squareds[x+1] <<- Coefs[[x]][[2]]
            })
 
+## This all seems a bit clunky.  Why not have two separate apply functions return an object organized correctly to then output?  
+            
             #Outside of the apply, I put in the R^2 for the null model into the vector of R squared values. 
             R.squareds[1] <- summary(lm(standY~1))[["r.squared"]]
             
@@ -100,7 +102,9 @@ setMethod(f="fitBMA",
             t(Post.MO[-missing]%*%x[-missing]) #matrix multiplication performs the multiplication and summation in one step.  Nice.  
           } #close the function
           ) #close the apply 
-           
+
+# good.
+            
            #This section calculates the posterior probability that the coefficient is non zero
           Post.NonZero <- apply(Coefficients[1:ncol(X),],1,function(x){
             sum(Post.MO[-which(is.na(x))])
@@ -109,5 +113,6 @@ setMethod(f="fitBMA",
           
             #it returns the output generated above as the input of the slots of an S4 object of "BMA class
             return(new("BMA", coefficients=Coefficients,R2=R.squareds,PostMO=Post.MO,PostEB=Post.EB,PostBetaNonZero=Post.NonZero,X=standX,y=standY,g=g))
+            # good.
           }
 )
